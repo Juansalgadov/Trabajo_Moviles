@@ -3,6 +3,10 @@
 Estos son los mockups que armamos antes de empezar a programar, para tener claro
 qué pantallas necesita la app y qué va en cada una.
 
+Los dejamos en gris a propósito. La idea era definir primero la estructura de cada
+pantalla, dónde va cada cosa y cómo se pasa de una a otra, sin pelear con los
+colores. La paleta la aplicamos cuando empecemos a programar las vistas.
+
 El caso es el de TECMUNDO (Duoc UC, DSY1105). La empresa trabaja con drones y
 agricultura de precisión, y lo que nos piden es un MVP que conecte a los
 agricultores que necesitan un servicio con los prestadores que lo ofrecen.
@@ -12,7 +16,8 @@ La app la vamos a llamar **TecMundo Match**.
 
 ## Paleta de colores
 
-Elegimos verde porque la app es del rubro agrícola y se entiende al tiro de qué se trata.
+Esta es la paleta que acordamos para cuando programemos las pantallas. Elegimos
+verde porque la app es del rubro agrícola y se entiende al tiro de qué se trata.
 
 | Uso | Color |
 |---|---|
@@ -134,4 +139,4 @@ publicadas.
 Los mockups todavía pueden cambiar cuando empecemos a programar, sobre todo el
 cálculo del porcentaje de compatibilidad, que es la parte que falta definir mejor.
 
-Cada pantalla tiene su issue en el repositorio con las tareas que hay que hacer.
+Cada pantalla tiene su issue en el milestone de mockups, repartidos entre los dos.
