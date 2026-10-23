@@ -1,4 +1,4 @@
-# Hectarea
+# Hectar-IA
 
 App movil para el caso de TECMUNDO, de la asignatura DSY1105 Desarrollo de
 Aplicaciones Moviles (Duoc UC).
