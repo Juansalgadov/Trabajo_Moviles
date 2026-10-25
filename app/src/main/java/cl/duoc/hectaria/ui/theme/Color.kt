@@ -2,10 +2,11 @@ package cl.duoc.hectaria.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// paleta de la app, verde porque el rubro es agricola
+val VerdePrincipal = Color(0xFF2E7D32)
+val VerdeClaro = Color(0xFFE8F5E9)
+val FondoApp = Color(0xFFF8FAF8)
+val TextoPrincipal = Color(0xFF212523)
+val TextoSecundario = Color(0xFF6E7671)
+val RojoError = Color(0xFFC62828)
+val NaranjoPendiente = Color(0xFFF57C00)
