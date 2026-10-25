@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "eval1"
+rootProject.name = "hectaria"
 include(":app")
  

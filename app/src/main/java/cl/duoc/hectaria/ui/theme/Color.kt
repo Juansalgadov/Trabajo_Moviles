@@ -1,4 +1,4 @@
-package com.example.eval1.ui.theme
+package cl.duoc.hectaria.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

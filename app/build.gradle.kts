@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.eval1"
+    namespace = "cl.duoc.hectaria"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.eval1"
+        applicationId = "cl.duoc.hectaria"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

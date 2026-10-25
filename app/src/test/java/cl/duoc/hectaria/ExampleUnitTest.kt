@@ -1,4 +1,4 @@
-package com.example.eval1
+package cl.duoc.hectaria
 
 import org.junit.Test
 
