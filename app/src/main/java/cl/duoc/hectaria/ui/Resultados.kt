@@ -1,5 +1,6 @@
 package cl.duoc.hectaria.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,7 +87,9 @@ fun Resultados(navController: NavController) {
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 itemsIndexed(resultados) { _, resultado ->
-                    TarjetaPrestador(resultado.first, resultado.second)
+                    TarjetaPrestador(resultado.first, resultado.second) {
+                        navController.navigate("detalle/" + resultado.first.id)
+                    }
                 }
             }
         }
@@ -94,9 +97,9 @@ fun Resultados(navController: NavController) {
 }
 
 @Composable
-fun TarjetaPrestador(prestador: Prestador, compatibilidad: Int) {
+fun TarjetaPrestador(prestador: Prestador, compatibilidad: Int, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

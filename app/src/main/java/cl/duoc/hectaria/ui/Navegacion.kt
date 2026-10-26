@@ -41,6 +41,10 @@ fun Navegacion() {
             composable("inicio") { Inicio(navController) }
             composable("nueva_necesidad") { NuevaNecesidad(navController) }
             composable("resultados") { Resultados(navController) }
+            composable("detalle/{prestadorId}") { entrada ->
+                val prestadorId = entrada.arguments?.getString("prestadorId")?.toIntOrNull() ?: 0
+                DetallePrestador(navController, prestadorId)
+            }
             composable("perfil") { Perfil(navController) }
         }
     }
