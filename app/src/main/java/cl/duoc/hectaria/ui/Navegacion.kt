@@ -40,6 +40,7 @@ fun Navegacion() {
             composable("registro") { Registro(navController) }
             composable("inicio") { Inicio(navController) }
             composable("nueva_necesidad") { NuevaNecesidad(navController) }
+            composable("resultados") { Resultados(navController) }
             composable("perfil") { Perfil(navController) }
         }
     }
