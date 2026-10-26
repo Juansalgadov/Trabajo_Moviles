@@ -105,7 +105,7 @@ fun NuevaNecesidad(navController: NavController, viewModel: NecesidadViewModel =
             onClick = {
                 if (viewModel.validarFormulario()) {
                     viewModel.guardar()
-                    navController.popBackStack()
+                    navController.navigate("resultados")
                 }
             },
             modifier = Modifier.fillMaxWidth()
