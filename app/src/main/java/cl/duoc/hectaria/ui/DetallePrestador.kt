@@ -11,11 +11,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +33,7 @@ import androidx.navigation.NavController
 import cl.duoc.hectaria.R
 import cl.duoc.hectaria.repository.NecesidadRepository
 import cl.duoc.hectaria.repository.PrestadorRepository
+import cl.duoc.hectaria.repository.VinculacionRepository
 import cl.duoc.hectaria.ui.theme.TextoSecundario
 import cl.duoc.hectaria.ui.theme.VerdeClaro
 
@@ -35,6 +42,7 @@ fun DetallePrestador(navController: NavController, prestadorId: Int) {
 
     val prestador = PrestadorRepository.buscarPorId(prestadorId)
     val necesidad = NecesidadRepository.ultima()
+    var abrirModal by remember { mutableStateOf(false) }
 
     if (prestador == null) {
         Text("No encontramos al prestador.", modifier = Modifier.padding(24.dp))
@@ -113,10 +121,38 @@ fun DetallePrestador(navController: NavController, prestadorId: Int) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
-            onClick = { },
+            onClick = { abrirModal = true },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Me interesa este prestador")
+        }
+
+        if (abrirModal) {
+            AlertDialog(
+                onDismissRequest = { abrirModal = false },
+                title = { Text("Confirmar vinculación") },
+                text = {
+                    Text("Vas a manifestar interés en ${prestador.nombre}. Esta es una vinculación simulada para el caso: no es un contrato ni un pago. ¿Confirmas?")
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        if (necesidad != null) {
+                            VinculacionRepository.agregar(prestador.nombre, necesidad.servicio, necesidad.cultivo)
+                        }
+                        abrirModal = false
+                        navController.navigate("inicio") {
+                            popUpTo("inicio") { inclusive = true }
+                        }
+                    }) {
+                        Text("Confirmar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { abrirModal = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
         }
     }
 }
