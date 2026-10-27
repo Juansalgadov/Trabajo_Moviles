@@ -1,13 +1,24 @@
 package cl.duoc.hectaria.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.model.AppDatabase
+import cl.duoc.hectaria.model.Usuario
+import cl.duoc.hectaria.model.Vinculacion
+import kotlinx.coroutines.launch
 
-class PerfilViewModel : ViewModel() {
+class PerfilViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val base = AppDatabase.obtener(application)
 
     val serviciosDisponibles = listOf("Fumigación con dron", "Aplicación foliar", "Monitoreo de cultivo", "Siembra con dron")
+
+    var usuario by mutableStateOf<Usuario?>(null)
+    var vinculaciones by mutableStateOf(listOf<Vinculacion>())
 
     var serviciosElegidos by mutableStateOf(listOf("Fumigación con dron"))
     var cobertura by mutableStateOf("")
@@ -17,6 +28,13 @@ class PerfilViewModel : ViewModel() {
 
     var errorCobertura by mutableStateOf("")
     var errorCapacidad by mutableStateOf("")
+
+    fun cargar() {
+        viewModelScope.launch {
+            usuario = base.usuarioDao().sesion()
+            vinculaciones = base.vinculacionDao().obtenerTodas()
+        }
+    }
 
     fun alternarServicio(servicio: String) {
         serviciosElegidos = if (servicio in serviciosElegidos) {
@@ -35,5 +53,12 @@ class PerfilViewModel : ViewModel() {
             else -> ""
         }
         return errorCobertura.isEmpty() && errorCapacidad.isEmpty()
+    }
+
+    fun cerrarSesion(alSalir: () -> Unit) {
+        viewModelScope.launch {
+            base.usuarioDao().cerrarSesiones()
+            alSalir()
+        }
     }
 }

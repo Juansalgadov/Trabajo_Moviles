@@ -18,20 +18,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import cl.duoc.hectaria.model.Necesidad
-import cl.duoc.hectaria.repository.NecesidadRepository
+import cl.duoc.hectaria.viewmodel.InicioViewModel
 import cl.duoc.hectaria.ui.theme.NaranjoPendiente
 import cl.duoc.hectaria.ui.theme.TextoSecundario
 import cl.duoc.hectaria.ui.theme.VerdeClaro
 import cl.duoc.hectaria.ui.theme.VerdePrincipal
 
 @Composable
-fun Inicio(navController: NavController) {
+fun Inicio(navController: NavController, viewModel: InicioViewModel = viewModel()) {
+
+    LaunchedEffect(Unit) {
+        viewModel.cargar()
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
@@ -47,7 +53,7 @@ fun Inicio(navController: NavController) {
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(NecesidadRepository.necesidades) { necesidad ->
+            items(viewModel.necesidades) { necesidad ->
                 TarjetaNecesidad(necesidad)
             }
         }

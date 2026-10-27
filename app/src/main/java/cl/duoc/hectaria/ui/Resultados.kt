@@ -18,6 +18,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,16 +28,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import cl.duoc.hectaria.model.Prestador
-import cl.duoc.hectaria.repository.NecesidadRepository
 import cl.duoc.hectaria.repository.PrestadorRepository
+import cl.duoc.hectaria.viewmodel.ResultadosViewModel
 import cl.duoc.hectaria.ui.theme.TextoSecundario
 
 @Composable
-fun Resultados(navController: NavController) {
+fun Resultados(navController: NavController, viewModel: ResultadosViewModel = viewModel()) {
 
-    val necesidad = NecesidadRepository.ultima()
+    LaunchedEffect(Unit) {
+        viewModel.cargar()
+    }
+
+    val necesidad = viewModel.necesidad
     var orden by remember { mutableStateOf("compatibilidad") }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -49,7 +55,9 @@ fun Resultados(navController: NavController) {
 
         if (necesidad == null) {
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Todavía no publicas ninguna necesidad.", color = TextoSecundario)
+            if (viewModel.cargado) {
+                Text("Todavía no publicas ninguna necesidad.", color = TextoSecundario)
+            }
             return@Column
         }
 

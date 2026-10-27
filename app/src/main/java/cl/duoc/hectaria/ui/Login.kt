@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +32,14 @@ import cl.duoc.hectaria.viewmodel.LoginViewModel
 
 @Composable
 fun Login(navController: NavController, viewModel: LoginViewModel = viewModel()) {
+
+    LaunchedEffect(Unit) {
+        viewModel.revisarSesion {
+            navController.navigate("inicio") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -83,7 +92,7 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
 
         Button(
             onClick = {
-                if (viewModel.validarFormulario()) {
+                viewModel.entrar {
                     navController.navigate("inicio") {
                         popUpTo("login") { inclusive = true }
                     }

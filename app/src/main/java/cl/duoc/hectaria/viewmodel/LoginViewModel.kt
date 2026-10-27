@@ -1,12 +1,18 @@
 package cl.duoc.hectaria.viewmodel
 
+import android.app.Application
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.model.AppDatabase
+import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dao = AppDatabase.obtener(application).usuarioDao()
 
     var correo by mutableStateOf("")
     var clave by mutableStateOf("")
@@ -36,5 +42,27 @@ class LoginViewModel : ViewModel() {
         val correoOk = validarCorreo()
         val claveOk = validarClave()
         return correoOk && claveOk
+    }
+
+    fun revisarSesion(alEntrar: () -> Unit) {
+        viewModelScope.launch {
+            if (dao.sesion() != null) {
+                alEntrar()
+            }
+        }
+    }
+
+    fun entrar(alEntrar: () -> Unit) {
+        if (!validarFormulario()) return
+        viewModelScope.launch {
+            val usuario = dao.buscar(correo, clave)
+            if (usuario == null) {
+                errorClave = "El correo o la contraseña no coinciden"
+            } else {
+                dao.cerrarSesiones()
+                dao.abrirSesion(usuario.correo)
+                alEntrar()
+            }
+        }
     }
 }

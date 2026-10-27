@@ -1,12 +1,18 @@
 package cl.duoc.hectaria.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import cl.duoc.hectaria.repository.NecesidadRepository
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.model.AppDatabase
+import cl.duoc.hectaria.model.Necesidad
+import kotlinx.coroutines.launch
 
-class NecesidadViewModel : ViewModel() {
+class NecesidadViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dao = AppDatabase.obtener(application).necesidadDao()
 
     val cultivos = listOf("Maíz", "Trigo", "Arándanos", "Manzanos", "Uva de mesa")
     val servicios = listOf("Fumigación con dron", "Aplicación foliar", "Monitoreo de cultivo", "Siembra con dron")
@@ -38,7 +44,19 @@ class NecesidadViewModel : ViewModel() {
                 errorSuperficie.isEmpty() && errorZona.isEmpty() && errorFecha.isEmpty()
     }
 
-    fun guardar() {
-        NecesidadRepository.agregar(cultivo, servicio, superficie.toInt(), zona, fecha)
+    fun guardar(alGuardar: () -> Unit) {
+        viewModelScope.launch {
+            dao.insertar(
+                Necesidad(
+                    cultivo = cultivo,
+                    servicio = servicio,
+                    superficie = superficie.toInt(),
+                    zona = zona,
+                    fecha = fecha,
+                    estado = "activa"
+                )
+            )
+            alGuardar()
+        }
     }
 }
