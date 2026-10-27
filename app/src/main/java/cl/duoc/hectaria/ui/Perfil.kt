@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,14 +30,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import cl.duoc.hectaria.repository.VinculacionRepository
 import cl.duoc.hectaria.ui.theme.TextoSecundario
 import cl.duoc.hectaria.viewmodel.PerfilViewModel
 
 @Composable
 fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel()) {
 
+    LaunchedEffect(Unit) {
+        viewModel.cargar()
+    }
+
     var guardado by remember { mutableStateOf(false) }
+    val usuario = viewModel.usuario
+    val esPrestador = usuario?.tipo == "prestador"
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState())
@@ -48,8 +54,17 @@ fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel(
             fontWeight = FontWeight.Bold
         )
 
+        if (usuario != null) {
+            Text(
+                text = "${usuario.nombre} · ${usuario.correo} · ${usuario.tipo}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextoSecundario
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
+        if (esPrestador) {
         Text("Servicios que ofrezco", style = MaterialTheme.typography.titleSmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             viewModel.serviciosDisponibles.take(2).forEach { servicio ->
@@ -114,14 +129,15 @@ fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel(
         ) {
             Text("Guardar cambios")
         }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text("Mis vinculaciones", style = MaterialTheme.typography.titleSmall)
-        if (VinculacionRepository.vinculaciones.isEmpty()) {
+        if (viewModel.vinculaciones.isEmpty()) {
             Text("Todavía no tienes vinculaciones.", style = MaterialTheme.typography.bodyMedium, color = TextoSecundario)
         } else {
-            VinculacionRepository.vinculaciones.forEach { vinculacion ->
+            viewModel.vinculaciones.forEach { vinculacion ->
                 Text(
                     text = "· ${vinculacion.prestador} - ${vinculacion.servicio} (${vinculacion.cultivo})",
                     style = MaterialTheme.typography.bodyMedium,
@@ -134,8 +150,10 @@ fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel(
 
         OutlinedButton(
             onClick = {
-                navController.navigate("login") {
-                    popUpTo(0) { inclusive = true }
+                viewModel.cerrarSesion {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

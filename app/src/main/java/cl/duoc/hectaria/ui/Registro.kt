@@ -133,7 +133,7 @@ fun Registro(navController: NavController, viewModel: RegistroViewModel = viewMo
 
         Button(
             onClick = {
-                if (viewModel.validarFormulario()) {
+                viewModel.registrar {
                     navController.navigate("inicio") {
                         popUpTo("login") { inclusive = true }
                     }

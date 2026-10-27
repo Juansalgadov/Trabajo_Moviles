@@ -1,12 +1,19 @@
 package cl.duoc.hectaria.viewmodel
 
+import android.app.Application
 import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.model.AppDatabase
+import cl.duoc.hectaria.model.Usuario
+import kotlinx.coroutines.launch
 
-class RegistroViewModel : ViewModel() {
+class RegistroViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dao = AppDatabase.obtener(application).usuarioDao()
 
     var nombre by mutableStateOf("")
     var correo by mutableStateOf("")
@@ -34,5 +41,14 @@ class RegistroViewModel : ViewModel() {
         errorConfirmar = if (confirmarClave != clave) "Las contraseñas no coinciden" else ""
         return errorNombre.isEmpty() && errorCorreo.isEmpty() &&
                 errorClave.isEmpty() && errorConfirmar.isEmpty()
+    }
+
+    fun registrar(alRegistrar: () -> Unit) {
+        if (!validarFormulario()) return
+        viewModelScope.launch {
+            dao.cerrarSesiones()
+            dao.guardar(Usuario(correo, nombre, clave, tipoUsuario, true))
+            alRegistrar()
+        }
     }
 }

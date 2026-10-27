@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,19 +30,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import cl.duoc.hectaria.R
-import cl.duoc.hectaria.repository.NecesidadRepository
 import cl.duoc.hectaria.repository.PrestadorRepository
-import cl.duoc.hectaria.repository.VinculacionRepository
+import cl.duoc.hectaria.viewmodel.ResultadosViewModel
 import cl.duoc.hectaria.ui.theme.TextoSecundario
 import cl.duoc.hectaria.ui.theme.VerdeClaro
 
 @Composable
-fun DetallePrestador(navController: NavController, prestadorId: Int) {
+fun DetallePrestador(navController: NavController, prestadorId: Int, viewModel: ResultadosViewModel = viewModel()) {
+
+    LaunchedEffect(Unit) {
+        viewModel.cargar()
+    }
 
     val prestador = PrestadorRepository.buscarPorId(prestadorId)
-    val necesidad = NecesidadRepository.ultima()
+    val necesidad = viewModel.necesidad
     var abrirModal by remember { mutableStateOf(false) }
 
     if (prestador == null) {
@@ -136,12 +141,11 @@ fun DetallePrestador(navController: NavController, prestadorId: Int) {
                 },
                 confirmButton = {
                     Button(onClick = {
-                        if (necesidad != null) {
-                            VinculacionRepository.agregar(prestador.nombre, necesidad.servicio, necesidad.cultivo)
-                        }
                         abrirModal = false
-                        navController.navigate("inicio") {
-                            popUpTo("inicio") { inclusive = true }
+                        viewModel.vincular(prestador.nombre) {
+                            navController.navigate("inicio") {
+                                popUpTo("inicio") { inclusive = true }
+                            }
                         }
                     }) {
                         Text("Confirmar")

@@ -104,8 +104,9 @@ fun NuevaNecesidad(navController: NavController, viewModel: NecesidadViewModel =
         Button(
             onClick = {
                 if (viewModel.validarFormulario()) {
-                    viewModel.guardar()
-                    navController.navigate("resultados")
+                    viewModel.guardar {
+                        navController.navigate("resultados")
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
