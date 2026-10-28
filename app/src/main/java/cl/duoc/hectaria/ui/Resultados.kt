@@ -17,6 +17,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,13 +37,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import cl.duoc.hectaria.model.Prestador
 import cl.duoc.hectaria.repository.PrestadorRepository
+import cl.duoc.hectaria.util.Notificaciones
 import cl.duoc.hectaria.viewmodel.ResultadosViewModel
 import cl.duoc.hectaria.ui.theme.TextoSecundario
 
 @Composable
 fun Resultados(navController: NavController, viewModel: ResultadosViewModel = viewModel()) {
 
+    val context = LocalContext.current
+
+    val permisoNotificaciones = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
+
     LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            permisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         viewModel.cargar()
     }
 
@@ -65,6 +80,12 @@ fun Resultados(navController: NavController, viewModel: ResultadosViewModel = vi
             "experiencia" -> PrestadorRepository.buscarCompatibles(necesidad).sortedByDescending { it.first.experiencia }
             "evaluación" -> PrestadorRepository.buscarCompatibles(necesidad).sortedByDescending { it.first.evaluacion }
             else -> PrestadorRepository.buscarCompatibles(necesidad)
+        }
+
+        LaunchedEffect(resultados.size) {
+            if (resultados.isNotEmpty()) {
+                Notificaciones.avisarResultados(context, resultados.size)
+            }
         }
 
         Text(
