@@ -19,6 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import android.Manifest
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -115,13 +118,30 @@ fun Resultados(navController: NavController, viewModel: ResultadosViewModel = vi
             )
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                itemsIndexed(resultados) { _, resultado ->
-                    TarjetaPrestador(resultado.first, resultado.second) {
-                        navController.navigate("detalle/" + resultado.first.id)
+                itemsIndexed(resultados) { indice, resultado ->
+                    TarjetaAnimada(indice) {
+                        TarjetaPrestador(resultado.first, resultado.second) {
+                            navController.navigate("detalle/" + resultado.first.id)
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun TarjetaAnimada(indice: Int, contenido: @Composable () -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(indice * 120L)
+        visible = true
+    }
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 })
+    ) {
+        contenido()
     }
 }
 

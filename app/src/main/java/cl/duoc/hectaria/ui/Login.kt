@@ -1,5 +1,9 @@
 package cl.duoc.hectaria.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +23,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +41,10 @@ import cl.duoc.hectaria.viewmodel.LoginViewModel
 @Composable
 fun Login(navController: NavController, viewModel: LoginViewModel = viewModel()) {
 
+    var logoVisible by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
+        logoVisible = true
         viewModel.revisarSesion {
             navController.navigate("inicio") {
                 popUpTo("login") { inclusive = true }
@@ -47,17 +58,24 @@ fun Login(navController: NavController, viewModel: LoginViewModel = viewModel())
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = "Hectar-IA",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "Conecta tu campo con el servicio correcto",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextoSecundario
-        )
+        AnimatedVisibility(
+            visible = logoVisible,
+            enter = fadeIn(animationSpec = tween(900)) + scaleIn(initialScale = 0.6f, animationSpec = tween(900))
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Hectar-IA",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Conecta tu campo con el servicio correcto",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextoSecundario
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
