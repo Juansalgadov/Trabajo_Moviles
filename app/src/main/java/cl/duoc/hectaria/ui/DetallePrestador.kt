@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import cl.duoc.hectaria.R
+import cl.duoc.hectaria.model.Prestador
 import cl.duoc.hectaria.repository.PrestadorRepository
 import cl.duoc.hectaria.viewmodel.ResultadosViewModel
 import cl.duoc.hectaria.ui.theme.TextoSecundario
@@ -45,10 +46,16 @@ fun DetallePrestador(navController: NavController, prestadorId: Int, viewModel: 
         viewModel.cargar()
     }
 
-    val prestador = PrestadorRepository.buscarPorId(prestadorId)
+    var prestadorCargado by remember { mutableStateOf<Prestador?>(null) }
+
+    LaunchedEffect(prestadorId) {
+        prestadorCargado = viewModel.obtenerPrestador(prestadorId)
+    }
+
     val necesidad = viewModel.necesidad
     var abrirModal by remember { mutableStateOf(false) }
 
+    val prestador = prestadorCargado
     if (prestador == null) {
         Text("No encontramos al prestador.", modifier = Modifier.padding(24.dp))
         return
@@ -142,9 +149,11 @@ fun DetallePrestador(navController: NavController, prestadorId: Int, viewModel: 
                 confirmButton = {
                     Button(onClick = {
                         abrirModal = false
-                        viewModel.vincular(prestador.nombre) {
-                            navController.navigate("inicio") {
-                                popUpTo("inicio") { inclusive = true }
+                        prestador?.let { p ->
+                            viewModel.vincular(p) {
+                                navController.navigate("inicio") {
+                                    popUpTo("inicio") { inclusive = true }
+                                }
                             }
                         }
                     }) {

@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.data.model.NecesidadApi
+import cl.duoc.hectaria.data.remote.RetrofitInstance
 import cl.duoc.hectaria.model.AppDatabase
 import cl.duoc.hectaria.model.Necesidad
 import kotlinx.coroutines.launch
@@ -46,6 +48,20 @@ class NecesidadViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun guardar(alGuardar: () -> Unit) {
         viewModelScope.launch {
+            val sesion = AppDatabase.obtener(getApplication()).usuarioDao().sesion()
+            try {
+                RetrofitInstance.api.guardarNecesidad(
+                    NecesidadApi(
+                        correo_usuario = sesion?.correo ?: "",
+                        zona = zona,
+                        cultivo = cultivo,
+                        servicio = servicio,
+                        superficie = superficie.toInt()
+                    )
+                )
+            } catch (e: Exception) {
+                // si la api falla igual dejamos la necesidad guardada aca
+            }
             dao.insertar(
                 Necesidad(
                     cultivo = cultivo,

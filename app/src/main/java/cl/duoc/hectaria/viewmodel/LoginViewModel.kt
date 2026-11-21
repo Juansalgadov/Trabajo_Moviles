@@ -7,7 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.data.remote.RetrofitInstance
 import cl.duoc.hectaria.model.AppDatabase
+import cl.duoc.hectaria.model.Usuario
 import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
@@ -55,13 +57,18 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun entrar(alEntrar: () -> Unit) {
         if (!validarFormulario()) return
         viewModelScope.launch {
-            val usuario = dao.buscar(correo, clave)
-            if (usuario == null) {
-                errorClave = "El correo o la contraseña no coinciden"
-            } else {
-                dao.cerrarSesiones()
-                dao.abrirSesion(usuario.correo)
-                alEntrar()
+            try {
+                val encontrados = RetrofitInstance.api.login(correo.trim(), clave)
+                val usuario = encontrados.firstOrNull()
+                if (usuario == null) {
+                    errorClave = "El correo o la contraseña no coinciden"
+                } else {
+                    dao.cerrarSesiones()
+                    dao.guardar(Usuario(usuario.correo, usuario.nombre, clave, usuario.tipo, true))
+                    alEntrar()
+                }
+            } catch (e: Exception) {
+                errorClave = "No pudimos conectarnos con el servidor"
             }
         }
     }

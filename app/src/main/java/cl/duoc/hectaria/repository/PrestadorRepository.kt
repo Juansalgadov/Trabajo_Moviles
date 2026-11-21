@@ -1,17 +1,22 @@
 package cl.duoc.hectaria.repository
 
+import cl.duoc.hectaria.data.model.aPrestador
+import cl.duoc.hectaria.data.remote.RetrofitInstance
 import cl.duoc.hectaria.model.Necesidad
 import cl.duoc.hectaria.model.Prestador
 
 object PrestadorRepository {
 
-    val prestadores = listOf(
-        Prestador(1, "AgroDron Maule", "Linares", listOf("Fumigación con dron", "Monitoreo de cultivo"), listOf("Maíz", "Trigo"), 150, 6, true, 4.8),
-        Prestador(2, "Servicios Aéreos del Sur", "Talca", listOf("Fumigación con dron", "Aplicación foliar"), listOf("Maíz", "Arándanos"), 100, 4, true, 4.5),
-        Prestador(3, "DroneCampo SpA", "Parral", listOf("Fumigación con dron", "Siembra con dron"), listOf("Trigo", "Uva de mesa"), 80, 3, false, 4.2),
-        Prestador(4, "AgroTec Parral", "Parral", listOf("Monitoreo de cultivo", "Aplicación foliar"), listOf("Maíz", "Manzanos"), 60, 5, true, 4.0),
-        Prestador(5, "Fumigadora Ñuble", "Chillán", listOf("Fumigación con dron"), listOf("Arándanos", "Uva de mesa"), 40, 2, true, 3.9)
-    )
+    var prestadores = listOf<Prestador>()
+
+    suspend fun cargarDesdeApi() {
+        prestadores = RetrofitInstance.api.obtenerPrestadores().map { it.aPrestador() }
+    }
+
+    suspend fun buscarPorId(id: Int): Prestador? {
+        if (prestadores.isEmpty()) cargarDesdeApi()
+        return prestadores.find { it.id == id }
+    }
 
     fun calcularCompatibilidad(prestador: Prestador, necesidad: Necesidad): Int {
         var puntos = 0
@@ -26,9 +31,11 @@ object PrestadorRepository {
     fun buscarCompatibles(necesidad: Necesidad): List<Pair<Prestador, Int>> {
         return prestadores
             .map { it to calcularCompatibilidad(it, necesidad) }
-            .filter { it.second > 0 }
+            .filter { (prestador, puntos) ->
+                puntos > 0 && (necesidad.zona.contains(prestador.zona, ignoreCase = true) ||
+                    necesidad.servicio in prestador.servicios ||
+                    necesidad.cultivo in prestador.cultivos)
+            }
             .sortedByDescending { it.second }
     }
-
-    fun buscarPorId(id: Int): Prestador? = prestadores.find { it.id == id }
 }

@@ -62,6 +62,15 @@ fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel(
             )
         }
 
+        OutlinedTextField(
+            value = viewModel.nombre,
+            onValueChange = { viewModel.nombre = it },
+            label = { Text("Mi nombre") },
+            isError = viewModel.errorNombre.isNotEmpty(),
+            supportingText = { if (viewModel.errorNombre.isNotEmpty()) Text(viewModel.errorNombre) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         if (esPrestador) {
@@ -124,7 +133,7 @@ fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = { if (viewModel.validarFormulario()) guardado = true },
+            onClick = { if (viewModel.validarFormulario()) viewModel.guardarCambios { guardado = true } },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Guardar cambios")
@@ -139,7 +148,8 @@ fun Perfil(navController: NavController, viewModel: PerfilViewModel = viewModel(
         } else {
             viewModel.vinculaciones.forEach { vinculacion ->
                 Text(
-                    text = "· ${vinculacion.prestador} - ${vinculacion.servicio} (${vinculacion.cultivo})",
+                    text = "· ${vinculacion.prestador_nombre} - ${vinculacion.servicio} (${vinculacion.cultivo})" +
+                        if (vinculacion.compatibilidad > 0) " · ${vinculacion.compatibilidad}%" else "",
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextoSecundario
                 )
