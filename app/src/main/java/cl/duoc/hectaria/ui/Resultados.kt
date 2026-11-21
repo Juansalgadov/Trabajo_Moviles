@@ -97,6 +97,15 @@ fun Resultados(navController: NavController, viewModel: ResultadosViewModel = vi
             color = TextoSecundario
         )
 
+        if (viewModel.clima.isNotEmpty()) {
+            Text(
+                text = viewModel.clima,
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextoSecundario
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
