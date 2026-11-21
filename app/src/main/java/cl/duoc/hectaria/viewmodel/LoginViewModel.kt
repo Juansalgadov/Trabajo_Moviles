@@ -58,7 +58,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         if (!validarFormulario()) return
         viewModelScope.launch {
             try {
-                val encontrados = RetrofitInstance.api.login(correo.trim(), clave)
+                val encontrados = RetrofitInstance.api.login("eq." + correo.trim(), "eq." + clave)
                 val usuario = encontrados.firstOrNull()
                 if (usuario == null) {
                     errorClave = "El correo o la contraseña no coinciden"

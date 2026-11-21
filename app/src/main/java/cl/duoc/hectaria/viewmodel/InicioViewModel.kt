@@ -21,13 +21,13 @@ class InicioViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             val sesion = AppDatabase.obtener(getApplication()).usuarioDao().sesion()
             necesidades = try {
-                RetrofitInstance.api.obtenerNecesidades(sesion?.correo ?: "").map {
+                RetrofitInstance.api.obtenerNecesidades("eq." + (sesion?.correo ?: "")).map {
                     Necesidad(
                         cultivo = it.cultivo,
                         servicio = it.servicio,
                         superficie = it.superficie,
                         zona = it.zona,
-                        fecha = it.fecha ?: "",
+                        fecha = it.fecha?.take(10)?.split("-")?.let { d -> d[2] + "/" + d[1] + "/" + d[0] } ?: "",
                         estado = "activa"
                     )
                 }
