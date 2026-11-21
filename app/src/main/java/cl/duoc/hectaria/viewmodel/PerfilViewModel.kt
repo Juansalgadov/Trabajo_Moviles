@@ -38,7 +38,7 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
             usuario = base.usuarioDao().sesion()
             nombre = usuario?.nombre ?: ""
             vinculaciones = try {
-                RetrofitInstance.api.obtenerVinculaciones(usuario?.correo ?: "")
+                RetrofitInstance.api.obtenerVinculaciones("eq." + (usuario?.correo ?: ""))
             } catch (e: Exception) {
                 base.vinculacionDao().obtenerTodas().map {
                     VinculacionApi(
@@ -59,7 +59,7 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             try {
                 RetrofitInstance.api.actualizarPerfil(
-                    actual.correo,
+                    "eq." + actual.correo,
                     UsuarioPatch(
                         nombre = nombre.ifBlank { null },
                         cobertura = if (actual.tipo == "prestador" && cobertura.isNotBlank()) cobertura else null,
