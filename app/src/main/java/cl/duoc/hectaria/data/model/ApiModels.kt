@@ -3,20 +3,34 @@ package cl.duoc.hectaria.data.model
 import cl.duoc.hectaria.model.Prestador
 
 data class PrestadorApi(
-    val id: Int,
+    val id: Int? = null,
+    val correo: String? = null,
     val nombre: String,
     val zona: String,
     val servicios: String,
-    val cultivos: String,
+    val cultivos: String = "",
     val capacidad: Int,
     val experiencia: Int,
-    val disponible: Boolean,
-    val evaluacion: Double
+    val disponible: Boolean = true,
+    val evaluacion: Double = 4.0
+)
+
+// los datos que envia el prestador cuando se publica en el catalogo (sin id: lo asigna la base)
+data class PublicarPrestador(
+    val correo: String,
+    val nombre: String,
+    val zona: String,
+    val servicios: String,
+    val cultivos: String = "",
+    val capacidad: Int,
+    val experiencia: Int,
+    val disponible: Boolean = true,
+    val evaluacion: Double = 4.0
 )
 
 fun PrestadorApi.aPrestador(): Prestador {
     return Prestador(
-        id = id,
+        id = id ?: 0,
         nombre = nombre,
         zona = zona,
         servicios = servicios.split(",").map { it.trim() },

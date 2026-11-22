@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cl.duoc.hectaria.data.model.PublicarPrestador
 import cl.duoc.hectaria.data.model.UsuarioPatch
 import cl.duoc.hectaria.data.model.VinculacionApi
 import cl.duoc.hectaria.data.remote.RetrofitInstance
@@ -67,6 +68,22 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
                         experiencia = if (actual.tipo == "prestador") experiencia.toIntOrNull() else null
                     )
                 )
+                // si es prestador, tambien se publica en el catalogo para salir en las busquedas
+                if (actual.tipo == "prestador") {
+                    RetrofitInstance.api.publicarPrestador(
+                        PublicarPrestador(
+                            correo = actual.correo,
+                            nombre = nombre.ifBlank { actual.nombre },
+                            zona = cobertura,
+                            servicios = serviciosElegidos.joinToString(", "),
+                            cultivos = "",
+                            capacidad = capacidad.toIntOrNull() ?: 0,
+                            experiencia = experiencia.toIntOrNull() ?: 0,
+                            disponible = true,
+                            evaluacion = 4.0
+                        )
+                    )
+                }
                 base.usuarioDao().guardar(actual.copy(nombre = nombre.ifBlank { actual.nombre }))
             } catch (e: Exception) {
                 // si falla la api igual avisamos que quedo local

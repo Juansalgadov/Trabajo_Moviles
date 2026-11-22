@@ -2,10 +2,12 @@ package cl.duoc.hectaria.data.remote
 
 import cl.duoc.hectaria.data.model.NecesidadApi
 import cl.duoc.hectaria.data.model.PrestadorApi
+import cl.duoc.hectaria.data.model.PublicarPrestador
 import cl.duoc.hectaria.data.model.UsuarioApi
 import cl.duoc.hectaria.data.model.UsuarioPatch
 import cl.duoc.hectaria.data.model.VinculacionApi
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -33,6 +35,10 @@ interface ApiService {
 
     @POST("vinculaciones")
     suspend fun guardarVinculacion(@Body vinculacion: VinculacionApi)
+
+    // el prestador se publica o actualiza en el catalogo
+    @POST("prestadores?on_conflict=correo")
+    suspend fun publicarPrestador(@Body prestador: PublicarPrestador, @Header("Prefer") prefer: String = "resolution=merge-duplicates")
 
     @GET("vinculaciones?select=*&order=fecha.desc")
     suspend fun obtenerVinculaciones(@Query("correo_usuario") correo: String): List<VinculacionApi>
