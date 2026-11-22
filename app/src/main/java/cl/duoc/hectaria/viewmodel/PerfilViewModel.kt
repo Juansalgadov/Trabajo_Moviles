@@ -38,6 +38,20 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             usuario = base.usuarioDao().sesion()
             nombre = usuario?.nombre ?: ""
+            // si es prestador, traigo sus datos del catalogo para llenar el formulario
+            if (usuario?.tipo == "prestador") {
+                try {
+                    val mios = RetrofitInstance.api.obtenerPrestadores().find { it.correo == usuario?.correo }
+                    if (mios != null) {
+                        cobertura = mios.zona
+                        capacidad = mios.capacidad.toString()
+                        experiencia = mios.experiencia.toString()
+                        serviciosElegidos = mios.servicios.split(",").map { it.trim() }
+                    }
+                } catch (e: Exception) {
+                    // sin internet el formulario queda vacio y ya
+                }
+            }
             vinculaciones = try {
                 RetrofitInstance.api.obtenerVinculaciones("eq." + (usuario?.correo ?: ""))
             } catch (e: Exception) {
@@ -66,7 +80,8 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
                         cobertura = if (actual.tipo == "prestador" && cobertura.isNotBlank()) cobertura else null,
                         capacidad = if (actual.tipo == "prestador") capacidad.toIntOrNull() else null,
                         experiencia = if (actual.tipo == "prestador") experiencia.toIntOrNull() else null
-                    )
+                    ),
+                    "return=representation"
                 )
                 // si es prestador, tambien se publica en el catalogo para salir en las busquedas
                 if (actual.tipo == "prestador") {
@@ -81,7 +96,8 @@ class PerfilViewModel(application: Application) : AndroidViewModel(application) 
                             experiencia = experiencia.toIntOrNull() ?: 0,
                             disponible = true,
                             evaluacion = 4.0
-                        )
+                        ),
+                        "resolution=merge-duplicates"
                     )
                 }
                 base.usuarioDao().guardar(actual.copy(nombre = nombre.ifBlank { actual.nombre }))
