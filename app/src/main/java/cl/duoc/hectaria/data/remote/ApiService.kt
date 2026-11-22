@@ -25,7 +25,7 @@ interface ApiService {
     suspend fun registrar(@Body usuario: UsuarioApi)
 
     @PATCH("usuarios?select=correo,nombre")
-    suspend fun actualizarPerfil(@Query("correo") correo: String, @Body datos: UsuarioPatch): List<UsuarioApi>
+    suspend fun actualizarPerfil(@Query("correo") correo: String, @Body datos: UsuarioPatch, @Header("Prefer") prefer: String): List<UsuarioApi>
 
     @POST("necesidades")
     suspend fun guardarNecesidad(@Body necesidad: NecesidadApi)
@@ -38,7 +38,7 @@ interface ApiService {
 
     // el prestador se publica o actualiza en el catalogo
     @POST("prestadores?on_conflict=correo")
-    suspend fun publicarPrestador(@Body prestador: PublicarPrestador, @Header("Prefer") prefer: String = "resolution=merge-duplicates")
+    suspend fun publicarPrestador(@Body prestador: PublicarPrestador, @Header("Prefer") prefer: String)
 
     @GET("vinculaciones?select=*&order=fecha.desc")
     suspend fun obtenerVinculaciones(@Query("correo_usuario") correo: String): List<VinculacionApi>
