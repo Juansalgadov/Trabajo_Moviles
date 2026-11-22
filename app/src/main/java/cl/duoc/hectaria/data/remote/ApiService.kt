@@ -19,8 +19,8 @@ interface ApiService {
     @GET("usuarios?select=*")
     suspend fun login(@Query("correo") correo: String, @Query("clave") clave: String): List<UsuarioApi>
 
-    @POST("usuarios?select=correo")
-    suspend fun registrar(@Body usuario: UsuarioApi): List<UsuarioApi>
+    @POST("usuarios")
+    suspend fun registrar(@Body usuario: UsuarioApi)
 
     @PATCH("usuarios?select=correo,nombre")
     suspend fun actualizarPerfil(@Query("correo") correo: String, @Body datos: UsuarioPatch): List<UsuarioApi>
